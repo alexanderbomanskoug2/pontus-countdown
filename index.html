@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countdown — 13 Feb, 09:00 (UTC+02:00)</title>
+  <style>
+    :root {
+      --bg: #f3f3f3;
+      --title: #008540;
+      --numbers: #00421b;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--title);
+      display: grid;
+      place-items: center;
+    }
+    main {
+      width: min(900px, 92vw);
+      text-align: center;
+      padding: 2rem 1.25rem 3rem;
+    }
+    h1 {
+      font-size: clamp(1.25rem, 2.5vw + 0.5rem, 2rem);
+      margin: 0 0 1.25rem 0;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .timer {
+      display: inline-flex;
+      gap: clamp(0.5rem, 2vw, 1rem);
+      align-items: stretch;
+      justify-content: center;
+      user-select: none;
+    }
+    .segment {
+      background: white;
+      border-radius: 1.25rem;
+      box-shadow: 0 10px 30px rgba(30,41,59,0.08), 0 2px 8px rgba(30,41,59,0.06);
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+      min-width: 110px;
+      display: grid;
+      grid-template-rows: auto auto;
+      align-items: center;
+    }
+    .segment span {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: clamp(2rem, 6vw, 4.25rem);
+      line-height: 1.1;
+      color: var(--numbers) !important;
+    }
+    .segment label {
+      margin-top: 0.35rem;
+      font-size: clamp(0.7rem, 1.3vw, 0.9rem);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--numbers) !important;
+    }
+    .colon {
+      display: grid; place-items: center;
+      font-weight: 800;
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      color: var(--numbers) !important;
+    }
+    .meta {
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+      color: var(--numbers) !important;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    footer { margin-top: 1.5rem; color: #475569; font-size: 0.875rem; }
+    code { background: #f1f5f9; padding: 0.15rem 0.35rem; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Countdown until Pontus "App God" Vigstrand starts!</h1>
+
+    <p id="sr" class="sr-only" aria-live="polite"></p>
+
+    <div class="timer" role="timer" aria-live="off" aria-atomic="true">
+      <div class="segment"><span id="days">0</span><label>days</label></div>
+      <div class="colon">:</div>
+      <div class="segment"><span id="hours">00</span><label>hours</label></div>
+      <div class="colon">:</div>
+      <div class="segment"><span id="minutes">00</span><label>minutes</label></div>
+      <div class="colon">:</div>
+      <div class="segment"><span id="seconds">00</span><label>seconds</label></div>
+    </div>
+
+    <div id="meta" class="sr-only meta"></div>
+
+  </main>
+
+  <script>
+    (() => {
+      const target = new Date(`2026-01-13T09:00:00+02:00`);
+      const targetIso = target.toISOString(); // absolute instant
+
+      const ids = ['days','hours','minutes','seconds'];
+      const els = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+      const sr = document.getElementById('sr');
+      const meta = document.getElementById('meta');
+
+      function updateMeta() {
+        const local = target.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'long' });
+        meta.textContent = `Target instant: ${local} (your time). Absolute time: ${targetIso.replace('Z', 'Z (UTC)')}.`;
+      }
+
+      function tick() {
+        const now = new Date();
+        let diff = target - now;
+
+        if (diff <= 0) {
+          els.days.textContent = '0';
+          els.hours.textContent = '00';
+          els.minutes.textContent = '00';
+          els.seconds.textContent = '00';
+          sr.textContent = "Time reached";
+          document.title = "It's time!";
+          clearInterval(timer);
+          return;
+        }
+
+        const sec = Math.floor(diff / 1000);
+        const days = Math.floor(sec / 86400);
+        const hours = Math.floor((sec % 86400) / 3600);
+        const minutes = Math.floor((sec % 3600) / 60);
+        const seconds = sec % 60;
+
+        els.days.textContent = String(days);
+        els.hours.textContent = String(hours).padStart(2, '0');
+        els.minutes.textContent = String(minutes).padStart(2, '0');
+        els.seconds.textContent = String(seconds).padStart(2, '0');
+
+        sr.textContent = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds remaining`;
+        document.title = `${days}d ${els.hours.textContent}:${els.minutes.textContent}:${els.seconds.textContent} — Countdown`;
+      }
+
+      updateMeta();
+      const timer = setInterval(tick, 250);
+      tick();
+    })();
+  </script>
+</body>
+</html>
